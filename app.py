@@ -629,7 +629,8 @@ def main():
             with left:
                 render_aqi_card(city, data)
             with right:
-                st.plotly_chart(render_gauge(data["aqi"]), use_container_width=True)
+                aqi_val = data.get("aqi", 0) if data else 0
+        st.plotly_chart(render_gauge(aqi_val), use_container_width=True)
 
             st.plotly_chart(render_trend_chart(hist_df, city), use_container_width=True)
 
