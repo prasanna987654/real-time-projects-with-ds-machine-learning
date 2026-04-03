@@ -381,34 +381,38 @@ def render_aqi_card(city: str, data: dict):
                 People with respiratory conditions should avoid outdoor activities.
             </div>""", unsafe_allow_html=True)
 
-
 def render_gauge(aqi: float):
     """Render an arc-gauge for the AQI value."""
-    level = classify_aqi(aqi)
+    # Ensure aqi is a valid number to prevent crashing
+    aqi_val = aqi if aqi is not None else 0
+    
+    level = classify_aqi(aqi_val)
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
-        value=aqi,
-        number={"font": {"size": 48, "color": level["color"], "family": "Space Mono"}},
+        value=aqi_val,
+        number={'font': {"size": 40, "color": level["color"], "family": "Space Mono"}},
         gauge={
-            "axis": {"range": [0, 300], "tickcolor": "#6b7a99",
-                     "tickfont": {"color": "#6b7a99", "size": 11}},
-            "bar":  {"color": level["color"], "thickness": 0.28},
+            "axis": {"range": [0, 300], "tickcolor": "#6b7a99"},
+            "tickfont": {"color": "#6b7a99", "size": 11},
+            "bar": {"color": level["color"], "thickness": 0.28},
             "bgcolor": "#111827",
-            "bordercolor": "#1e2a45",
+            "borderwidth": 0,
             "steps": [
-                {"range": [0, 50],   "color": "#14532d33"},
+                {"range": [0, 50], "color": "#14532d33"},
                 {"range": [51, 100], "color": "#713f1233"},
-                {"range": [101,150], "color": "#7c2d1233"},
-                {"range": [151,200], "color": "#7f1d1d33"},
-                {"range": [201,300], "color": "#4a044e33"},
+                {"range": [101, 150], "color": "#7c2d1233"},
+                {"range": [151, 200], "color": "#7f1d1d33"},
+                {"range": [201, 300], "color": "#4a044e33"},
             ],
             "threshold": {
-                "line":  {"color": level["color"], "width": 3},
+                "line": {"color": level["color"], "width": 3},
                 "thickness": 0.75,
-                "value": aqi,
-            },
-        },
+                "value": aqi_val,
+            }
+        }
     ))
+    return fig # Make sure this return is at the end of the function
+
     fig.update_layout(
         height=260,
         margin=dict(l=20, r=20, t=20, b=10),
