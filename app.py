@@ -510,132 +510,37 @@ def render_aqi_legend():
         </div>"""
     html += "</div>"
     st.markdown(html, unsafe_allow_html=True)
-
-
 # ══════════════════════════════════════════════════════════════════════════════
 # 4. MAIN APPLICATION
-# ══════════════════════════════════════════════════════════════════════════════
-
 def main():
-    # ── Header ──────────────────────────────────────────────────────────────
-    st.markdown("""
-    <div style="margin-bottom:8px;">
-        <span style="font-family:'Space Mono',monospace; font-size:0.75rem;
-               color:#3b82f6; text-transform:uppercase; letter-spacing:2px;">
-            AIRPULSE v1.0
-        </span>
-        <h1 style="margin:4px 0 2px 0; font-size:2.2rem; color:#e0e6f0;">
-            Smart City Air Quality Analyzer
-        </h1>
-        <p style="color:#6b7a99; margin:0; font-size:0.95rem;">
-            Real-time & dataset-based AQI monitoring across global cities
-        </p>
-    </div>
-    <hr style="margin:16px 0 24px 0;">
-    """, unsafe_allow_html=True)
+    # --- API Data Fetching with Safety Checks ---
+    hist_df = fetch_historical_aqi(lat, lon, api_key, days=trend_days)
+    
+    # Safety check for the AQI value
+    aqi_base = data.get("aqi", 0) if data else 0
+    
+    if hist_df is None or hist_df.empty:
+        hist_df = synthetic_historical(aqi_base, days=trend_days)
 
-    # ── Sidebar ──────────────────────────────────────────────────────────────
-    with st.sidebar:
-        st.markdown("### ⚙️ Configuration")
-        st.markdown("---")
+    st.caption(f"**Source:** {src_label}")
 
-        data_source = st.radio(
-            "Data Source",
-            ["📦  Built-in Dataset", "🌐  Live API (OpenWeatherMap)"],
-            help="Use dataset for instant results; API key needed for live data."
-        )
-        use_live = "Live" in data_source
+    # --- Layout Section ---
+    left, right = st.columns([2, 1])
 
-        api_key = ""
-        if use_live:
-            api_key = st.text_input(
-                "OWM API Key",
-                type="password",
-                placeholder="Paste your free API key here",
-                help="Get a free key at https://openweathermap.org/api",
-            )
-            if not api_key:
-                st.info("🔑 Enter your OpenWeatherMap API key above to enable live data fetching.")
-
-        st.markdown("---")
-        st.markdown("### 🔔 Alert Threshold")
-        st.session_state["alert_threshold"] = st.slider(
-            "Trigger alert when AQI ≥", 50, 300, 150, 10
-        )
-
-        st.markdown("---")
-        st.markdown("### 🗓️ Trend Window")
-        trend_days = st.selectbox("Historical days", [7, 14, 30], index=2)
-
-        st.markdown("---")
-        st.markdown("### 📖 AQI Legend")
-        render_aqi_legend()
-
-    # ── Tabs ─────────────────────────────────────────────────────────────────
-    tab1, tab2, tab3 = st.tabs(["🔍 Single City", "⚖️ Compare Cities", "🏭 Top Polluted"])
-
-    # ══════════════════════════════════════════════════════════════════════
-    # TAB 1 — Single City
-    # ══════════════════════════════════════════════════════════════════════
-    with tab1:
-        col_input, col_gap = st.columns([3, 1])
-        with col_input:
-            city_list = sorted(CITY_DATASET.keys())
-            default_idx = city_list.index("Delhi") if "Delhi" in city_list else 0
-            city = st.selectbox("Select a city", city_list, index=default_idx)
-
-            if use_live:
-                custom_city = st.text_input(
-                    "…or type any city name (live API)",
-                    placeholder="e.g. Kathmandu",
-                )
-                if custom_city.strip():
-                    city = custom_city.strip()
-
-        check = st.button("🔍 Check Air Quality", key="check_single")
-
-        if check:
-            with st.spinner(f"Fetching data for **{city}**…"):
-                # ── Fetch data ────────────────────────────────────────────
-                live_data = None
-                if use_live and api_key:
-                    live_data = fetch_realtime_aqi(city, api_key)
-                    if live_data is None:
-                        st.warning("⚠️ Live fetch failed — falling back to dataset.")
-
-                if live_data:
-                    data = live_data
-                    src_label = "🟢 Live — OpenWeatherMap"
-                    lat, lon  = live_data["lat"], live_data["lon"]
-                elif city in CITY_DATASET:
-                    data      = CITY_DATASET[city]
-                    src_label = "📦 Built-in Dataset (2024 avg)"
-                    lat, lon  = data["lat"], data["lon"]
-                else:
-                    st.error(f"City **{city}** not found in dataset and live fetch unavailable.")
-                    st.stop()
-
-                # ── Fetch historical ──────────────────────────────────────
-                hist_df = pd.DataFrame()
-                if use_live and api_key:
-                    hist_df = fetch_historical_aqi(lat, lon, api_key, days=trend_days)
-                if hist_df.empty:
-                    hist_df = synthetic_historical(data["aqi"], days=trend_days)
-
-            st.caption(f"**Source:** {src_label}")
-
-            # ── Layout ────────────────────────────────────────────────────
-            left, right = st.columns([2, 1])
-            with left:
-                render_aqi_card(city, data)
-            with right:
-                aqi_val = data.get("aqi", 0) if data else 0
+    with left:
+        render_aqi_card(city, data)
+    
+    with right:
+        # Final safety check for the gauge
+        aqi_val = data.get("aqi", 0) if data else 0
+    
+        # Render the Gauge and Trend Chart
         st.plotly_chart(render_gauge(aqi_val), use_container_width=True)
+        st.plotly_chart(render_trend_chart(hist_df, city), use_container_width=True)
 
-            st.plotly_chart(render_trend_chart(hist_df, city), use_container_width=True)
-
-    # ══════════════════════════════════════════════════════════════════════
-    # TAB 2 — Compare Cities
+if __name__ == "__main__":
+    main()
+    # TAB 2 — Compare City
     # ══════════════════════════════════════════════════════════════════════
     with tab2:
         city_list = sorted(CITY_DATASET.keys())
