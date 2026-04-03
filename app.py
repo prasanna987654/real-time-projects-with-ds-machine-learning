@@ -19,14 +19,43 @@ st.set_page_config(
 # SAMPLE CITY DATA
 # ─────────────────────────────────────────
 CITY_DATASET = {
+
     "Delhi": {"aqi": 185, "lat": 28.61, "lon": 77.20},
     "Mumbai": {"aqi": 95, "lat": 19.07, "lon": 72.87},
-    "London": {"aqi": 55, "lat": 51.50, "lon": -0.12},
-    "Tokyo": {"aqi": 70, "lat": 35.67, "lon": 139.65},
-    "New York": {"aqi": 80, "lat": 40.71, "lon": -74.00},
-    "Beijing": {"aqi": 160, "lat": 39.90, "lon": 116.40}
-}
+    "Hyderabad": {"aqi": 110, "lat": 17.38, "lon": 78.48},
+    "Bangalore": {"aqi": 75, "lat": 12.97, "lon": 77.59},
+    "Chennai": {"aqi": 90, "lat": 13.08, "lon": 80.27},
+    "Kolkata": {"aqi": 140, "lat": 22.57, "lon": 88.36},
+    "Pune": {"aqi": 85, "lat": 18.52, "lon": 73.85},
+    "Ahmedabad": {"aqi": 120, "lat": 23.02, "lon": 72.57},
+    "Jaipur": {"aqi": 130, "lat": 26.91, "lon": 75.79},
+    "Lucknow": {"aqi": 150, "lat": 26.84, "lon": 80.94},
 
+    "New York": {"aqi": 80, "lat": 40.71, "lon": -74.00},
+    "Los Angeles": {"aqi": 95, "lat": 34.05, "lon": -118.24},
+    "Chicago": {"aqi": 70, "lat": 41.87, "lon": -87.62},
+    "Toronto": {"aqi": 65, "lat": 43.65, "lon": -79.38},
+    "Mexico City": {"aqi": 120, "lat": 19.43, "lon": -99.13},
+
+    "London": {"aqi": 55, "lat": 51.50, "lon": -0.12},
+    "Paris": {"aqi": 60, "lat": 48.85, "lon": 2.35},
+    "Berlin": {"aqi": 50, "lat": 52.52, "lon": 13.40},
+    "Madrid": {"aqi": 70, "lat": 40.41, "lon": -3.70},
+    "Rome": {"aqi": 75, "lat": 41.90, "lon": 12.49},
+
+    "Tokyo": {"aqi": 70, "lat": 35.67, "lon": 139.65},
+    "Beijing": {"aqi": 160, "lat": 39.90, "lon": 116.40},
+    "Shanghai": {"aqi": 140, "lat": 31.23, "lon": 121.47},
+    "Seoul": {"aqi": 90, "lat": 37.56, "lon": 126.97},
+    "Bangkok": {"aqi": 130, "lat": 13.75, "lon": 100.50},
+
+    "Dubai": {"aqi": 100, "lat": 25.20, "lon": 55.27},
+    "Singapore": {"aqi": 65, "lat": 1.35, "lon": 103.82},
+    "Sydney": {"aqi": 45, "lat": -33.86, "lon": 151.20},
+    "Johannesburg": {"aqi": 85, "lat": -26.20, "lon": 28.04},
+    "Cairo": {"aqi": 170, "lat": 30.04, "lon": 31.23}
+
+}
 # ─────────────────────────────────────────
 # AQI CATEGORY FUNCTION
 # ─────────────────────────────────────────
